@@ -256,9 +256,10 @@ let current_program () =
 
 let run_in_program ~loc ?(program = current_program ()) ?(st_setup=fun _ x -> x) (qloc, query) =
   let elpi = P.ensure_initialized () in
+  Printf.eprintf "%b\n" !Flags.quiet;
   P.get_and_compile ~loc ~even_if_empty:true program |> Option.map (fun (base, _) ->
     let query_ast = Ast (st_setup base, P.parse_goal ~loc ~elpi qloc query) in
-    run_and_print ~print:true ~loc program base query_ast |>
+    run_and_print ~print:(not !Flags.quiet) ~loc program base query_ast |>
     (fun (x,y,_,_,_,_) -> x,y))
 
   let accumulate_extra_dep ~loc ~program ~scope ~what file =
